@@ -1,7 +1,10 @@
 // Copyright (C) 2026, Boundary Mode Extension
 // Based on microReticulum_Firmware by Mark Qvist
 //
-// BoundaryConfig.h — Captive-portal web configuration for Boundary Mode.
+// BoundaryConfig.h — Captive-portal web configuration for the legacy
+// "Boundary Mode" path. This should be renamed to "Transport Mode"
+// together with the rest of the boundary-mode terminology. In this fork,
+// transport/boundary mode is the only intended mode of operation.
 // When triggered (first boot with no config, or button hold >5s),
 // the device starts a WiFi AP with a web form for all settings:
 //   WiFi STA credentials, TCP backbone params, LoRa radio params,
@@ -58,6 +61,16 @@ static const char* const BW_OPTIONS_LABELS[] PROGMEM = {
     BW_LABEL_5, BW_LABEL_6, BW_LABEL_7, BW_LABEL_8, BW_LABEL_9,
 };
 static const int BW_OPTIONS_COUNT = sizeof(BW_OPTIONS_HZ) / sizeof(BW_OPTIONS_HZ[0]);
+
+static uint8_t config_default_display_rotation() {
+    #if BOARD_MODEL == BOARD_LORA32_V2_1 || BOARD_MODEL == BOARD_TBEAM || BOARD_MODEL == BOARD_RAK4631
+    return 0;
+    #elif BOARD_MODEL == BOARD_HELTEC32_V2 || BOARD_MODEL == BOARD_HELTEC32_V3 || BOARD_MODEL == BOARD_HELTEC32_V4 || BOARD_MODEL == BOARD_HELTEC_T114 || BOARD_MODEL == BOARD_TBEAM_S_V1
+    return 1;
+    #else
+    return 3;
+    #endif
+}
 
 // ─── HTML Page Generation ────────────────────────────────────────────────────
 
@@ -304,6 +317,11 @@ static void config_send_html() {
         cur_blank = EEPROM.read(eeprom_addr(ADDR_CONF_DBLK));
     }
 
+    uint8_t cur_rotation = EEPROM.read(eeprom_addr(ADDR_CONF_DROT));
+    if (cur_rotation > 3) {
+        cur_rotation = config_default_display_rotation();
+    }
+
     static const uint8_t blank_vals[]   = { 0, 1, 5, 10, 30, 60 };
     static const char* blank_labels[]   = { "Never", "1 minute", "5 minutes", "10 minutes", "30 minutes", "60 minutes" };
     static const int blank_count = 6;
@@ -319,6 +337,23 @@ static void config_send_html() {
     }
     html += F("</select>");
     html += F("<p class='note'>Turn off display after inactivity to save power</p>");
+
+    html += F("<label>Display Orientation</label><select name='disp_rot'>");
+    html += F("<option value='0'");
+    if (cur_rotation == 0) html += F(" selected");
+    html += F(">Landscape</option>");
+    html += F("<option value='1'");
+    if (cur_rotation == 1) html += F(" selected");
+    html += F(">Portrait</option>");
+    html += F("<option value='2'");
+    if (cur_rotation == 2) html += F(" selected");
+    html += F(">Landscape Flipped</option>");
+    html += F("<option value='3'");
+    if (cur_rotation == 3) html += F(" selected");
+    html += F(">Portrait Flipped</option>");
+    html += F("</select>");
+    html += F("<p class='note'>Choose the orientation that matches your OLED mounting. "
+              "Landscape modes place the two status panes side by side; portrait modes stack them.</p>");
 
     // ── Submit ──
     html += F(
@@ -353,6 +388,14 @@ static void config_handle_save() {
     // Set WiFi mode to STA
     EEPROM.write(eeprom_addr(ADDR_CONF_WIFI), WR_WIFI_STA);
 
+    // Boundary mode always uses DHCP on the STA interface. Clear the legacy
+    // static IP and netmask slots so stale values from older firmware or tools
+    // cannot force a persistent static address.
+    for (int i = 0; i < 4; i++) {
+        EEPROM.write(config_addr(ADDR_CONF_IP + i), 0x00);
+        EEPROM.write(config_addr(ADDR_CONF_NM + i), 0x00);
+    }
+
     // ── WiFi enable setting ──
     boundary_state.wifi_enabled = (config_server->arg("wifi_en").toInt() == 1);
 
@@ -369,6 +412,12 @@ static void config_handle_save() {
         eeprom_update(eeprom_addr(ADDR_CONF_BSET), CONF_OK_BYTE);
         eeprom_update(eeprom_addr(ADDR_CONF_DBLK), blank_val);
     }
+
+    int display_rotation = config_server->arg("disp_rot").toInt();
+    if (display_rotation < 0 || display_rotation > 3) {
+        display_rotation = config_default_display_rotation();
+    }
+    eeprom_update(eeprom_addr(ADDR_CONF_DROT), (uint8_t)display_rotation);
 
     // ── TCP backbone settings ──
     boundary_state.tcp_mode = (uint8_t)config_server->arg("tcp_mode").toInt(); // 0=disabled, 1=client
@@ -481,6 +530,14 @@ static void config_handle_redirect() {
 
 // ─── Check if config is needed ───────────────────────────────────────────────
 bool boundary_needs_config() {
+    // If the RTNode app marker is missing, this node was either never
+    // configured by RTNode or was flashed from a different firmware family
+    // such as stock RNode. Force the portal so RTNode can claim and rewrite
+    // its persisted settings explicitly.
+    if (!boundary_app_marker_valid()) {
+        return true;
+    }
+
     // Check if WiFi SSID is configured
     char ssid[33];
     for (int i = 0; i < 32; i++) {

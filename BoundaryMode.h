@@ -1,9 +1,11 @@
 // Copyright (C) 2026, Boundary Mode Extension
 // Based on microReticulum_Firmware by Mark Qvist
 //
-// BoundaryMode.h — Configuration and runtime state for the Boundary Mode
-// firmware variant. This header defines the WiFi backbone connection
-// parameters and boundary-specific operational settings.
+// BoundaryMode.h — Configuration and runtime state for the legacy
+// "Boundary Mode" firmware variant. Going forward this should be renamed
+// "Transport Mode". It is the only intended operating mode for this fork;
+// the old multi-mode split is kept only for compatibility while the codebase
+// is being simplified.
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,7 +17,18 @@
 
 #ifdef BOUNDARY_MODE
 
+// Compatibility alias for the planned rename from Boundary Mode to
+// Transport Mode. New code should prefer the transport terminology even
+// while the legacy BOUNDARY_MODE compile-time flag still exists.
+#ifndef TRANSPORT_MODE
+#define TRANSPORT_MODE 1
+#endif
+
 // ─── Boundary Mode Configuration ────────────────────────────────────────────
+//
+// NOTE: "Boundary Mode" is the legacy name. This should be relabeled
+// "Transport Mode" once the remaining non-transport code paths are removed.
+// In practice this is the only supported mode in this firmware branch.
 //
 // The boundary node operates with TWO RNS interfaces:
 //
@@ -72,10 +85,16 @@
 #define ADDR_CONF_IFAC_EN   0xD6  // IFAC enable flag (1 byte, 0x73 = enabled)
 #define ADDR_CONF_IFAC_NAME 0xD7  // Network name (33 bytes, null-terminated)
 #define ADDR_CONF_IFAC_PASS 0xF8  // Passphrase (33 bytes, null-terminated)
-// Total: 0x119 (281 bytes — extends beyond 256-byte CONFIG area into
+#define ADDR_CONF_APP_MARKER0 0x119 // RTNode app marker byte 0
+#define ADDR_CONF_APP_MARKER1 0x11A // RTNode app marker byte 1
+#define ADDR_CONF_APP_VERSION 0x11B // RTNode app config version
+// Total: 0x11C (284 bytes — extends beyond 256-byte CONFIG area into
 //         unused EEPROM gap; safe on ESP32 where EEPROM starts at 824)
 
 #define BOUNDARY_ENABLE_BYTE 0x73
+#define BOUNDARY_APP_MARKER0 0x52
+#define BOUNDARY_APP_MARKER1 0x54
+#define BOUNDARY_APP_VERSION 0x01
 
 // ─── Boundary Mode Runtime State ─────────────────────────────────────────────
 #ifndef BOUNDARY_STATE_DEFINED
@@ -114,6 +133,24 @@ struct BoundaryState {
 extern BoundaryState boundary_state;
 
 // ─── Boundary Mode EEPROM Load/Save ─────────────────────────────────────────
+
+inline bool boundary_app_marker_valid() {
+    return EEPROM.read(config_addr(ADDR_CONF_APP_MARKER0)) == BOUNDARY_APP_MARKER0 &&
+           EEPROM.read(config_addr(ADDR_CONF_APP_MARKER1)) == BOUNDARY_APP_MARKER1;
+}
+
+inline bool boundary_app_version_matches() {
+    return boundary_app_marker_valid() &&
+           EEPROM.read(config_addr(ADDR_CONF_APP_VERSION)) == BOUNDARY_APP_VERSION;
+}
+
+inline void boundary_clear_app_marker() {
+    EEPROM.write(config_addr(ADDR_CONF_APP_MARKER0), 0xFF);
+    EEPROM.write(config_addr(ADDR_CONF_APP_MARKER1), 0xFF);
+    EEPROM.write(config_addr(ADDR_CONF_APP_VERSION), 0xFF);
+    EEPROM.write(config_addr(ADDR_CONF_BMODE), 0xFF);
+    EEPROM.commit();
+}
 
 inline void boundary_load_config() {
     // Check if boundary mode is configured
@@ -258,6 +295,9 @@ inline void boundary_save_config() {
         EEPROM.write(config_addr(ADDR_CONF_IFAC_PASS + i), boundary_state.ifac_passphrase[i]);
     }
     EEPROM.write(config_addr(ADDR_CONF_IFAC_PASS + 32), 0x00);
+    EEPROM.write(config_addr(ADDR_CONF_APP_MARKER0), BOUNDARY_APP_MARKER0);
+    EEPROM.write(config_addr(ADDR_CONF_APP_MARKER1), BOUNDARY_APP_MARKER1);
+    EEPROM.write(config_addr(ADDR_CONF_APP_VERSION), BOUNDARY_APP_VERSION);
 
     EEPROM.commit();
 }

@@ -78,6 +78,13 @@ void wifi_remote_start_ap() {
 void wifi_remote_start_sta() {
   WiFi.mode(WIFI_STA);
 
+#ifdef BOUNDARY_MODE
+  // Boundary mode does not expose static STA addressing in its config flow.
+  // Always return the station interface to DHCP so stale legacy EEPROM data
+  // cannot pin the node to an unintended address.
+  WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE);
+#else
+
   uint8_t ip[4]; bool ip_ok = true;
   for (uint8_t i = 0; i < 4; i++) { ip[i]  = EEPROM.read(config_addr(ADDR_CONF_IP+i)); }
   if (ip[0]==0x00 && ip[1]==0x00 && ip[2]==0x00 && ip[3]==0x00) { ip_ok = false; }
@@ -97,6 +104,7 @@ void wifi_remote_start_sta() {
     IPAddress dns2(1, 1, 1, 1);
     WiFi.config(sta_ip, sta_gw, sta_nm, dns1, dns2);
   }
+#endif
 
   delay(100);
   if (wr_ssid[0] != 0x00) {

@@ -28,6 +28,9 @@
 #include "Utilities.h"
 
 // CBA Boundary Mode
+// NOTE: Boundary Mode is the legacy name. This firmware branch intends to
+// converge on a single Transport Mode, with the BOUNDARY_MODE symbol kept
+// temporarily as a compatibility shim during cleanup.
 #ifdef BOUNDARY_MODE
 #include "BoundaryMode.h"
 #include "TcpInterface.h"
@@ -525,6 +528,7 @@ void setup() {
 
     // Enter config mode if: first boot with no config, OR button-triggered reboot,
     // OR bootloop detected
+    bool app_marker_missing = !boundary_app_marker_valid();
     bool need_config = boundary_needs_config();
     bool config_requested = (boundary_config_request == BOUNDARY_CONFIG_MAGIC);
     bool skip_config = (boundary_skip_config == BOUNDARY_SKIP_MAGIC);
@@ -543,6 +547,9 @@ void setup() {
         Serial.println("[Boundary] Entering config portal due to bootloop recovery");
       } else if (config_requested) {
         Serial.println("[Boundary] Config mode requested via button hold");
+      } else if (app_marker_missing) {
+        Serial.println("[Boundary] RTNode app marker missing — previous firmware was not RTNode or config is unclaimed");
+        Serial.println("[Boundary] Starting config portal to migrate settings into RTNode");
       } else {
         Serial.println("[Boundary] No configuration found — starting config portal");
       }
@@ -1734,6 +1741,9 @@ void serial_callback(uint8_t sbyte) {
       eeprom_conf_save();
     } else if (command == CMD_CONF_DELETE) {
       eeprom_conf_delete();
+      #ifdef BOUNDARY_MODE
+        boundary_clear_app_marker();
+      #endif
     } else if (command == CMD_FB_EXT) {
       #if HAS_DISPLAY == true
         if (sbyte == 0xFF) {
