@@ -89,7 +89,7 @@ By default, `flash.py` uses the bundled `Release/esptool/esptool.py` for reprodu
 The flash utility auto-detects whether a V3 or V4 is connected by querying the flash size (8MB = V3, 16MB = V4). You can override with `--board v3` or `--board v4`. It will list all available serial ports and prompt you to choose one. If no ports are detected, you may need to hold the **BOOT** button while pressing **RESET** to enter download mode.
 
 ### Option B: Build from Source (PlatformIO)
-*Note: At present only Boundry mode is verified for Xiao esp32S3 and LilyGo T3S3*
+*Note: At present only Boundry mode and environments in [Quick Start] are supported.
 For development or customization:
 
 ```bash
