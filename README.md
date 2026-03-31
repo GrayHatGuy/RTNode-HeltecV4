@@ -1,7 +1,7 @@
-# RTNode-HeltecV4 - Reticulum Transport Node Heltec WiFi LoRa 32 V4
-### *Includes support for: HeltecV3, Xiao esp32s3_WIO_SX1262, and LilyGo T3S3-MSVR*
+# RTNode-Reticulum Transport Node 
+### *Includes support for: HeltecV3/V4, Xiao esp32s3_WIO_SX1262, and LilyGo T3S3-MSVR*
 
-A custom firmware for the **Heltec WiFi LoRa 32 V4/V3, XIAO ESP32SS** (ESP32-S3 + SX1262), and **LilyGo T3S3-MSVR** (ESP32-S3 + SX1280) that operates as a **Transport Node** — bridging a local LoRa radio network with a remote TCP/IP backbone (such as [rmap.world](https://rmap.world)) over WiFi.
+A custom firmware for the **Heltec WiFi LoRa 32 V4/V3, XIAO ESP32SS** (ESP32-S3 + SX1262), and **LilyGo T3S3-MSVR** (ESP32-S3 + SX1280) that operates as a **Transport Node** — in Boundtry mode only and bridging a local LoRa radio network with a remote TCP/IP backbone (such as [rmap.world](https://rmap.world)) over WiFi.
 
 This project was primarily developed with the use of AI assistance.
 
@@ -52,10 +52,18 @@ This firmware was designed for the **Heltec WiFi LoRa 32 V4** and expanded to ac
 
 ## Quick Start
 
+*Note: At present only the following environments are supported. The other environments commented out in the platformio.ini are works in process for reference only. Use at your own risk*
+
+- lilygo-t3-s3-sx1280-pa-boundary  
+- heltec_V3_boundary              
+- heltec_V4_boundary               
+- heltec_V4_boundary-local            
+- seeed_xiao_esp32s3_boundary       
+
 ### Option A: Easy Flash (no PlatformIO required)
 
 The easiest way to flash a pre-built firmware. You only need Python 3 and a USB cable.
-*Note: See option B for flashing Xiao esp32 or Lilygo T3S3*
+
 ```bash
 # Clone this repo (or download just flash.py + the firmware binary)
 git clone https://github.com/jrl290/RTNode-HeltecV4.git
@@ -81,7 +89,7 @@ By default, `flash.py` uses the bundled `Release/esptool/esptool.py` for reprodu
 The flash utility auto-detects whether a V3 or V4 is connected by querying the flash size (8MB = V3, 16MB = V4). You can override with `--board v3` or `--board v4`. It will list all available serial ports and prompt you to choose one. If no ports are detected, you may need to hold the **BOOT** button while pressing **RESET** to enter download mode.
 
 ### Option B: Build from Source (PlatformIO)
-*Note: At present only Boundry mode is verified for Xiao esp32S3 and LilyGo T3S3*
+*Note: At present only Boundry mode and environments in [Quick Start](https://github.com/GrayHatGuy/RTNode-HeltecV4/blob/main/README.md#quick-start) are supported.
 For development or customization:
 
 ```bash
@@ -115,7 +123,7 @@ pio device monitor -e heltec_V4_boundary
 ```
 
 ### Option C: Manual esptool Flash
-*Note: See option B for flashing Xiao esp32 or Lilygo T3S3*
+
 If you have the merged binary (`rtnode_heltec_v4.bin`), you can flash it with a single esptool command:
 
 ```bash
