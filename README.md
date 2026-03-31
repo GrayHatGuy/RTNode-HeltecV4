@@ -1,4 +1,5 @@
-# RTNode-HeltecV4 - Reticulum Transport Node for Heltec WiFi LoRa 32 V4 - including support for V3, Xiao esp32s3_WIO_SX1262, and LilyGo T3S3-MSVR
+# RTNode-HeltecV4 - Reticulum Transport Node Heltec WiFi LoRa 32 V4
+## including support for V3, Xiao esp32s3_WIO_SX1262, and LilyGo T3S3-MSVR
 
 A custom firmware for the **Heltec WiFi LoRa 32 V4/XIAO ESP32SS** (ESP32-S3 + SX1262) and **LilyGo T3S3-MSVR** (ESP32-S3 + SX1280) that operates as a **Transport Node** — bridging a local LoRa radio network with a remote TCP/IP backbone (such as [rmap.world](https://rmap.world)) over WiFi.
 
