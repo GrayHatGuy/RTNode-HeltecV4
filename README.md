@@ -51,6 +51,15 @@ This firmware was designed for the **Heltec WiFi LoRa 32 V4** and expanded to ac
 
 
 ## Quick Start
+*Note: At present only the following environments are supported. The other environments commented out in the platformio.ini are works in process for reference only. Use at your own risk*
+
+Environment                      Status   
+-------------------------------  --------  
+lilygo-t3-s3-sx1280-pa-boundary  SUCCESS  
+heltec_V3_boundary               SUCCESS  
+heltec_V4_boundary               SUCCESS   
+heltec_V4_boundary-local         SUCCESS   
+seeed_xiao_esp32s3_boundary      SUCCESS   
 
 ### Option A: Easy Flash (no PlatformIO required)
 
