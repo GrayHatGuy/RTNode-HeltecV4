@@ -96,11 +96,11 @@ pio run -e heltec_V4_boundary
 # Build for V3
 pio run -e heltec_V3_boundary
 
-# Build for Xiao esp32S3 with WIO SX1622 (Boundry Mode Only)
-
+# Build for Seeed Xiao esp32S3 with WIO SX1622 (Boundry Mode Only)
+pio run -e seeed_xiao_esp32s3_boundary
 
 # Build for Lilygo T3S3 (Boundry Mode Only)
-
+pio run -e lilygo-t3-s3-sx1280-pa-boundary
 
 # Flash (via PlatformIO)
 # update environment to reflect device type
