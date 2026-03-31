@@ -35,9 +35,9 @@ Built on [microReticulum](https://github.com/attermann/microReticulum) (a C++ po
 ## Hardware
 
 This firmware was designed for the **Heltec WiFi LoRa 32 V4** and expanded to accomodate the **XIAO ESP32SS with a WIO SX1262 shield** and **LilyGo T3S3-MSVR** (ESP32 + SX1280). This board was chosen for its 2MB PSRAM (4MB T3S3 and 8MB for xiao esp32s3) with LoRa capabilities. While the V3 is supported, it uses the ESP32-S3FN8 which has **no PSRAM**. The firmware **detects PSRAM at runtime** and allocates the TLSF memory pool from SPIRAM when available, falling back to internal SRAM (~170 KB) on boards without PSRAM.
-
+```
 | Component | Heltec V3 | Heltec V4 | T3S3 | Xiao esp32s3 |
-|-----------|-----------|----------|
+|-----------|-----------|----------|------------|------------|
 | **MCU** | ESP32-S3 (ESP32-S3FN8) | ESP32-S3 (ESP32-S3FH4R2) | ESP32-S3 dual-core Xtensa LX7 up to 240MHz |ESP32-S3R8 Xtensa LX7 dual-core 32-bit (up to 240 MHz)|
 | **Flash** | 8 MB | 16 MB |  8MB   |  8MB  |
 | **PSRAM** | None | 2 MB (QSPI) |  8MB  |  8MB  |
@@ -46,7 +46,7 @@ This firmware was designed for the **Heltec WiFi LoRa 32 V4** and expanded to ac
 | **Display** | SSD1306 OLED 128×64 | SSD1306 OLED 128×64 | SSD1306 OLED 128×64 | none
 | **WiFi** | 2.4 GHz 802.11 b/g/n | 2.4 GHz 802.11 b/g/n | 2.4 GHz b/g/n Wi-Fi & Bluetooth 5.0 | 2.4GHz b/g/n Wi-Fi and Bluetooth 5.0/Bluetooth Mesh|
 | **USB** | Native USB CDC | Native USB CDC |  Native USB CDC | Native USB CDC|
-
+```
 ## Quick Start
 
 ### Option A: Easy Flash (no PlatformIO required)
