@@ -54,7 +54,7 @@ This firmware was designed for the **Heltec WiFi LoRa 32 V4** and expanded to ac
 ### Option A: Easy Flash (no PlatformIO required)
 
 The easiest way to flash a pre-built firmware. You only need Python 3 and a USB cable.
-*See option B for flashing 
+*Note: See option B for flashing Xiao esp32 or Lilygo T3S3*
 ```bash
 # Clone this repo (or download just flash.py + the firmware binary)
 git clone https://github.com/jrl290/RTNode-HeltecV4.git
@@ -80,7 +80,7 @@ By default, `flash.py` uses the bundled `Release/esptool/esptool.py` for reprodu
 The flash utility auto-detects whether a V3 or V4 is connected by querying the flash size (8MB = V3, 16MB = V4). You can override with `--board v3` or `--board v4`. It will list all available serial ports and prompt you to choose one. If no ports are detected, you may need to hold the **BOOT** button while pressing **RESET** to enter download mode.
 
 ### Option B: Build from Source (PlatformIO)
-
+*Note: At present only Boundry mode is verified for Xiao esp32S3 and LilyGo T3S3*
 For development or customization:
 
 ```bash
@@ -95,7 +95,14 @@ pio run -e heltec_V4_boundary
 # Build for V3
 pio run -e heltec_V3_boundary
 
+# Build for Xiao esp32S3 with WIO SX1622 (Boundry Mode Only)
+
+
+# Build for Lilygo T3S3 (Boundry Mode Only)
+
+
 # Flash (via PlatformIO)
+# update environment to reflect device type
 pio run -e heltec_V4_boundary -t upload
 
 # Or create a merged binary and flash with the utility
@@ -107,7 +114,7 @@ pio device monitor -e heltec_V4_boundary
 ```
 
 ### Option C: Manual esptool Flash
-
+*Note: See option B for flashing Xiao esp32 or Lilygo T3S3*
 If you have the merged binary (`rtnode_heltec_v4.bin`), you can flash it with a single esptool command:
 
 ```bash
@@ -211,6 +218,7 @@ The LoRa radio operates in **Access Point mode**. In Reticulum, this means:
 - The interface broadcasts its own announces but **blocks rebroadcast of remote announces** from crossing to LoRa
 - This prevents backbone announces (hundreds of remote destinations) from flooding the limited-bandwidth LoRa channel
 - Local nodes discover the transport node directly; the transport node answers path requests for remote destinations from its cache
+*Note: Only boundary mode has been verified on Xiao esp32s3 and Lilygo T3S3*
 
 ### TCP Backbone Interface — `MODE_BOUNDARY`
 
@@ -222,6 +230,7 @@ The TCP backbone connection uses `MODE_BOUNDARY` (`0x20`), a custom transport mo
 ### Optional Local TCP Server — `MODE_ACCESS_POINT`
 
 If enabled, a TCP server on the WiFi network allows local Reticulum nodes to connect. It also uses Access Point mode, with the same announce filtering as LoRa.
+*Note: Only boundary mode has been verified on Xiao esp32s3 and Lilygo T3S3*
 
 **Implementation details:**
 - Each TCP interface must have a **unique name** to produce a unique interface hash — the backbone uses `"TcpInterface"` and the local server uses `"LocalTcpInterface"`. Without distinct names, both interfaces produce the same hash, causing the interface map lookup to fail when routing packets.
@@ -242,6 +251,8 @@ The ESP32-S3 has limited RAM compared to a desktop Reticulum node. Several custo
 | Known destinations | 100 | **24** | Identity cache; rarely need more on a transport node |
 | Max queued announces | 16 | **4** | Outbound announce queue; LoRa is slow, no point queuing many |
 | Max receipts | 1,024 | **20** | Packet receipt tracking |
+
+*Note: given the comparable sizes of compute associated with the Xioa esp32S3 and Lilygo T3S3 it is estimage to have a table tize limit similar but less than the Heltec V4 estimates*
 
 ### Timeout Reductions
 
