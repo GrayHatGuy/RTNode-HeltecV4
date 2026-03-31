@@ -416,7 +416,7 @@ static void config_handle_save() {
 
     // ── WiFi enable setting ──
     boundary_state.wifi_enabled = (config_server->arg("wifi_en").toInt() == 1);
-
+#if HAS_DISPLAY
     // ── Display blanking (EEPROM stores minutes, 0 = disabled) ──
     int blank_minutes = config_server->arg("disp_blank").toInt();
     if (blank_minutes <= 0) {
@@ -430,7 +430,7 @@ static void config_handle_save() {
         eeprom_update(eeprom_addr(ADDR_CONF_BSET), CONF_OK_BYTE);
         eeprom_update(eeprom_addr(ADDR_CONF_DBLK), blank_val);
     }
-
+#endif
     int display_rotation = config_server->arg("disp_rot").toInt();
     if (display_rotation < 0 || display_rotation > 3) {
         display_rotation = config_default_display_rotation();

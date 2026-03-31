@@ -506,7 +506,11 @@
       #define HAS_CONSOLE true
       #define HAS_WIFI true
       #define HAS_BLUETOOTH false
-      #define HAS_BLE true
+      #ifdef BOUNDARY_MODE
+        #define HAS_BLE false
+      #else
+        #define HAS_BLE true
+      #endif
       #define HAS_PMU true
       #define HAS_NP false
       #define HAS_SD false
