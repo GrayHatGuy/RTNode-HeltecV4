@@ -1,6 +1,6 @@
-# RTNode-HeltecV4 — Reticulum Transport Node for Heltec WiFi LoRa 32 V4 (with support for V3)
+# RTNode-HeltecV4 — Reticulum Transport Node for Heltec WiFi LoRa 32 V4 (with support for V3, Xiao esp32s2_WIO_SX1262, and LilyGo T3S3-msvr-PA) 
 
-A custom firmware for the **Heltec WiFi LoRa 32 V4** (ESP32-S3 + SX1262) that operates as a **Transport Node** — bridging a local LoRa radio network with a remote TCP/IP backbone (such as [rmap.world](https://rmap.world)) over WiFi.
+A custom firmware for the **Heltec WiFi LoRa 32 V4/XIAO ESP32SS** (ESP32-S3 + SX1262) and **LilyGo T3S3-MSVR** (ESP32 + SX1280) that operates as a **Transport Node** — bridging a local LoRa radio network with a remote TCP/IP backbone (such as [rmap.world](https://rmap.world)) over WiFi.
 
 This project was primarily developed with the use of AI assistance.
 
@@ -12,7 +12,7 @@ This project was primarily developed with the use of AI assistance.
   └──────────┘                │                                rmap.world)
                          LoRa Radio                                ▲
                               │            ┌──────────────┐  WiFi  │
-                       ◄── RF mesh ──────► │ RTNode-HV4  │ ◄─TCP──┘
+                       ◄── RF mesh ──────► │ RTNode       │ ◄─TCP──┘
                               │            │Transport Node│    ▲
                         Other RNodes       └──────────────┘    │
                                                            ┌───┴───┐
@@ -34,25 +34,25 @@ Built on [microReticulum](https://github.com/attermann/microReticulum) (a C++ po
 
 ## Hardware
 
-This firmware was designed for the **Heltec WiFi LoRa 32 V4**. This board was chosen for its 2MB PSRAM and LoRa capabilities. While the V3 is supported, it uses the ESP32-S3FN8 which has **no PSRAM**. The firmware **detects PSRAM at runtime** and allocates the TLSF memory pool from SPIRAM when available, falling back to internal SRAM (~170 KB) on boards without PSRAM.
+This firmware was designed for the **Heltec WiFi LoRa 32 V4** and expanded to accomodate the **XIAO ESP32SS with a WIO SX1262 shield** and **LilyGo T3S3-MSVR** (ESP32 + SX1280). This board was chosen for its 2MB PSRAM (4MB T3S3 and 8MB for xiao esp32s3) with LoRa capabilities. While the V3 is supported, it uses the ESP32-S3FN8 which has **no PSRAM**. The firmware **detects PSRAM at runtime** and allocates the TLSF memory pool from SPIRAM when available, falling back to internal SRAM (~170 KB) on boards without PSRAM.
 
-| Component | Heltec V3 | Heltec V4 |
+| Component | Heltec V3 | Heltec V4 | T3S3 | Xiao esp32s3 |
 |-----------|-----------|----------|
-| **MCU** | ESP32-S3 (ESP32-S3FN8) | ESP32-S3 (ESP32-S3FH4R2) |
-| **Flash** | 8 MB | 16 MB |
-| **PSRAM** | None | 2 MB (QSPI) |
-| **Radio** | SX1262 | SX1262 + GC1109 PA |
-| **TX Power** | Up to 22 dBm | Up to 28 dBm |
-| **Display** | SSD1306 OLED 128×64 | SSD1306 OLED 128×64 |
-| **WiFi** | 2.4 GHz 802.11 b/g/n | 2.4 GHz 802.11 b/g/n |
-| **USB** | Native USB CDC | Native USB CDC |
+| **MCU** | ESP32-S3 (ESP32-S3FN8) | ESP32-S3 (ESP32-S3FH4R2) | ESP32-S3 dual-core Xtensa LX7 up to 240MHz |ESP32-S3R8 Xtensa LX7 dual-core 32-bit (up to 240 MHz)|
+| **Flash** | 8 MB | 16 MB |  8MB   |  8MB  |
+| **PSRAM** | None | 2 MB (QSPI) |  8MB  |  8MB  |
+| **Radio** | SX1262 | SX1262 + GC1109 PA | SX1280 | SX1262 - shield |
+| **TX Power** | Up to 22 dBm | Up to 28 dBm |  20dBm  |  22dBm   |
+| **Display** | SSD1306 OLED 128×64 | SSD1306 OLED 128×64 | SSD1306 OLED 128×64 | none
+| **WiFi** | 2.4 GHz 802.11 b/g/n | 2.4 GHz 802.11 b/g/n | 2.4 GHz b/g/n Wi-Fi & Bluetooth 5.0 | 2.4GHz b/g/n Wi-Fi and Bluetooth 5.0/Bluetooth Mesh|
+| **USB** | Native USB CDC | Native USB CDC |  Native USB CDC | Native USB CDC|
 
 ## Quick Start
 
 ### Option A: Easy Flash (no PlatformIO required)
 
 The easiest way to flash a pre-built firmware. You only need Python 3 and a USB cable.
-
+*See option B for flashing 
 ```bash
 # Clone this repo (or download just flash.py + the firmware binary)
 git clone https://github.com/jrl290/RTNode-HeltecV4.git
