@@ -51,6 +51,7 @@ This firmware was designed for the **Heltec WiFi LoRa 32 V4** and expanded to ac
 
 
 ## Quick Start
+
 *Note: At present only the following environments are supported. The other environments commented out in the platformio.ini are works in process for reference only. Use at your own risk*
 
 Environment                      Status   
