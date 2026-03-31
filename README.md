@@ -63,7 +63,7 @@ This firmware was designed for the **Heltec WiFi LoRa 32 V4** and expanded to ac
 ### Option A: Easy Flash (no PlatformIO required)
 
 The easiest way to flash a pre-built firmware. You only need Python 3 and a USB cable.
-*Note: See option B for flashing Xiao esp32 or Lilygo T3S3*
+
 ```bash
 # Clone this repo (or download just flash.py + the firmware binary)
 git clone https://github.com/jrl290/RTNode-HeltecV4.git
@@ -123,7 +123,7 @@ pio device monitor -e heltec_V4_boundary
 ```
 
 ### Option C: Manual esptool Flash
-*Note: See option B for flashing Xiao esp32 or Lilygo T3S3*
+
 If you have the merged binary (`rtnode_heltec_v4.bin`), you can flash it with a single esptool command:
 
 ```bash
