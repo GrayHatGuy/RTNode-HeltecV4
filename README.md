@@ -252,7 +252,7 @@ The ESP32-S3 has limited RAM compared to a desktop Reticulum node. Several custo
 | Max queued announces | 16 | **4** | Outbound announce queue; LoRa is slow, no point queuing many |
 | Max receipts | 1,024 | **20** | Packet receipt tracking |
 
-*Note: given the comparable sizes of compute associated with the Xioa esp32S3 and Lilygo T3S3 it is estimage to have a table tize limit similar but less than the Heltec V4 estimates*
+*Note: given the comparable sizes of compute associated with the Xioa esp32S3 and Lilygo T3S3 it is estimated they will have a table tize limit similar but less than the Heltec V4 estimates*
 
 ### Timeout Reductions
 
